@@ -56,6 +56,8 @@ int main(void) {
     pthread_join(another_reader_t, NULL);
     pthread_join(writer_t, NULL);
     pthread_join(another_writer_t, NULL);
+    printf("deleting lock.\n");
+    lock_delete(&rwlock);
     printf("simulation ended.\n");
     exit(EXIT_SUCCESS);
 }

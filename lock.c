@@ -123,6 +123,27 @@ bool unlock(lock_t *lock) {
 }
 
 bool lock_delete(lock_t *lock) {
-    (void)lock;
-    return false;
+    holder_t holder;
+    pthread_mutex_lock(&lock->mutex);
+    while (lock->readers != NULL) {
+        holder.thread = lock->readers->thread;
+        holder.prio = lock->readers->prio;
+        remove_holder(&lock->readers, holder);
+        set_prio(holder.thread, holder.prio);
+    }
+    while (lock->writers != NULL) {
+        holder.thread = lock->writers->thread;
+        holder.prio = lock->writers->prio;
+        remove_holder(&lock->writers, holder);
+        set_prio(holder.thread, holder.prio);
+    }
+    lock->readers = NULL;
+    lock->writers = NULL;
+    lock->lprio = -9999;
+    lock->lstate = FREE;
+    pthread_cond_broadcast(&lock->cond);
+    pthread_cond_destroy(&lock->cond);
+    pthread_mutex_unlock(&lock->mutex);
+    pthread_mutex_destroy(&lock->mutex);
+    return true;
 }
