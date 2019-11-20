@@ -31,15 +31,16 @@ bool lock(lock_t *lock, lstate_t type) {
         pthread_mutex_unlock(&lock->mutex);
         return false;
     }
-    if (holder.prio > lock->lprio) {
-        printf("inheriting prio - %d\n", holder.prio);
-        lock->lprio = holder.prio;
-        set_holders_prio(lock->readers, lock->lprio);
-        set_holders_prio(lock->writers, lock->lprio);
-    }
     switch (type) {
         case READ:
             while (count_holders(lock->writers) > 0) {
+                tprio_t prio = get_prio(holder.thread);
+                if (prio > lock->lprio) {
+                    printf("inheriting prio - %d\n", prio);
+                    lock->lprio = prio;
+                    set_holders_prio(lock->readers, lock->lprio);
+                    set_holders_prio(lock->writers, lock->lprio);
+                }
                 pthread_cond_wait(&lock->cond, &lock->mutex);
             }
             insert_holder(&lock->readers, holder);
@@ -48,6 +49,13 @@ bool lock(lock_t *lock, lstate_t type) {
             break;
         case WRITE:
             while (count_holders(lock->writers) > 0 || count_holders(lock->readers) > 0) {
+                tprio_t prio = get_prio(holder.thread);
+                if (prio > lock->lprio) {
+                    printf("inheriting prio - %d\n", prio);
+                    lock->lprio = prio;
+                    set_holders_prio(lock->readers, lock->lprio);
+                    set_holders_prio(lock->writers, lock->lprio);
+                }
                 pthread_cond_wait(&lock->cond, &lock->mutex);
             }
             insert_holder(&lock->writers, holder);
@@ -57,7 +65,7 @@ bool lock(lock_t *lock, lstate_t type) {
         default:
             break;
     }
-    if (lock->lprio > holder.prio) {
+    if (lock->lprio != holder.prio) {
         printf("switching to lock prio - %d\n", lock->lprio);
         set_prio(holder.thread, lock->lprio);
     }
