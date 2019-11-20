@@ -122,7 +122,7 @@ bool unlock(lock_t *lock) {
     return true;
 }
 
-bool lock_delete(lock_t *lock) {
+bool lock_destroy(lock_t *lock) {
     holder_t holder;
     pthread_mutex_lock(&lock->mutex);
     while (lock->readers != NULL) {

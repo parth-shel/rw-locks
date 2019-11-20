@@ -23,7 +23,7 @@ extern bool lock_create(lock_t *);
 extern bool lock(lock_t *, lstate_t);
 extern bool try_lock(lock_t *, lstate_t);
 extern bool unlock(lock_t *);
-extern bool lock_delete(lock_t *);
+extern bool lock_destroy(lock_t *);
 
 #define isbadtype(type) (type != READ && type != WRITE)
 
