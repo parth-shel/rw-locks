@@ -33,3 +33,6 @@
 
 # Swap Files
 *.sw?
+
+# GDB History Files
+*.gdb_history
