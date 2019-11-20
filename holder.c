@@ -25,18 +25,18 @@ bool exists_holder(holder_t *handle, holder_t holder) {
     return false;
 }
 
-void insert_holder(holder_t *handle, holder_t holder) {
+void insert_holder(holder_t **handle, holder_t holder) {
     holder_t *new_holder = malloc(sizeof(holder_t));
     new_holder->thread = holder.thread;
     new_holder->prio = holder.prio;
-    new_holder->next = handle;
-    handle = new_holder;
+    new_holder->next = (*handle);
+    (*handle) = new_holder;
 }
 
-void remove_holder(holder_t *handle, holder_t holder) {
-    holder_t *ptr = handle, *temp;
+void remove_holder(holder_t **handle, holder_t holder) {
+    holder_t *ptr = *handle, *temp;
     if (ptr != NULL && ptr->thread == holder.thread) {
-        handle = handle->next;
+        ptr = ptr->next;
         free(ptr);
         return;
     }

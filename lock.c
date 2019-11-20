@@ -1,6 +1,7 @@
 /* lock.c */
 
 #include <pthread.h>
+#include <stdio.h>
 #include <lock.h>
 #include <holder.h>
 #include <scheduling.h>
@@ -40,7 +41,7 @@ bool lock(lock_t *lock, lstate_t type) {
             while (count_holders(lock->writers) > 0) {
                 pthread_cond_wait(&lock->cond, &lock->mutex);
             }
-            insert_holder(lock->readers, holder);
+            insert_holder(&lock->readers, holder);
             printf("added reader. - %d\n", count_holders(lock->readers));
             lock->lstate = READ;
             break;
@@ -48,7 +49,7 @@ bool lock(lock_t *lock, lstate_t type) {
             while (count_holders(lock->writers) > 0 || count_holders(lock->readers) > 0) {
                 pthread_cond_wait(&lock->cond, &lock->mutex);
             }
-            insert_holder(lock->writers, holder);
+            insert_holder(&lock->writers, holder);
             printf("added writer. - %d\n", count_holders(lock->writers));
             lock->lstate = WRITE;
             break;
@@ -91,7 +92,8 @@ bool unlock(lock_t *lock) {
     }
     if (exists_holder(lock->readers, holder)) {
         holder.prio = get_holders_prio(lock->readers, holder);
-        remove_holder(lock->readers, holder);
+        remove_holder(&lock->readers, holder);
+        printf("removed reader - %d\n", count_holders(lock->readers));
         if (count_holders(lock->readers) == 0) {
             lock->lstate = FREE;
             pthread_cond_signal(&lock->cond);
@@ -99,7 +101,8 @@ bool unlock(lock_t *lock) {
     }
     if (exists_holder(lock->writers, holder)) {
         holder.prio = get_holders_prio(lock->writers, holder);
-        remove_holder(lock->writers, holder);
+        remove_holder(&lock->writers, holder);
+        printf("removed writer - %d\n", count_holders(lock->writers));
         if (count_holders(lock->writers) == 0) {
             lock->lstate = FREE;
             pthread_cond_signal(&lock->cond);
@@ -116,5 +119,6 @@ bool unlock(lock_t *lock) {
 }
 
 bool lock_delete(lock_t *lock) {
+    (void)lock;
     return false;
 }

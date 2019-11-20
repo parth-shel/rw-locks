@@ -16,8 +16,8 @@ struct holder_t {
 
 extern int      count_holders(holder_t *);
 extern bool     exists_holder(holder_t *, holder_t);
-extern void     insert_holder(holder_t *, holder_t);
-extern void     remove_holder(holder_t *, holder_t);
+extern void     insert_holder(holder_t **, holder_t);
+extern void     remove_holder(holder_t **, holder_t);
 extern tprio_t  get_max_prio(holder_t *);
 extern tprio_t  get_min_prio(holder_t *);
 extern void     set_holders_prio(holder_t *, tprio_t);
