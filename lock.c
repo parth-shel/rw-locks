@@ -14,7 +14,7 @@ bool lock_create(lock_t *lock) {
     pthread_cond_init(&lock->cond, NULL);
     lock->readers = NULL;
     lock->writers = NULL;
-    lock->lprio = 0;
+    lock->lprio = -9999;
     lock->lstate = FREE;
     return true;
 }
@@ -32,6 +32,7 @@ bool lock(lock_t *lock, lstate_t type) {
         return false;
     }
     if (holder.prio > lock->lprio) {
+        printf("inheriting prio - %d\n", holder.prio);
         lock->lprio = holder.prio;
         set_holders_prio(lock->readers, lock->lprio);
         set_holders_prio(lock->writers, lock->lprio);
@@ -57,6 +58,7 @@ bool lock(lock_t *lock, lstate_t type) {
             break;
     }
     if (lock->lprio > holder.prio) {
+        printf("switching to lock prio - %d\n", lock->lprio);
         set_prio(holder.thread, lock->lprio);
     }
     pthread_mutex_unlock(&lock->mutex);
@@ -109,9 +111,11 @@ bool unlock(lock_t *lock) {
         }
     }
     if (holder.prio != lock->lprio) {
+        printf("switching back to orignal prio - %d\n", holder.prio);
         set_prio(holder.thread, holder.prio);
     } 
     lock->lprio = max_prio(get_max_prio(lock->readers), get_max_prio(lock->writers));
+    printf("updated lock prio - %d\n", lock->lprio);
     set_holders_prio(lock->readers, lock->lprio);
     set_holders_prio(lock->writers, lock->lprio);
     pthread_mutex_unlock(&lock->mutex);

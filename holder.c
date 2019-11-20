@@ -34,9 +34,9 @@ void insert_holder(holder_t **handle, holder_t holder) {
 }
 
 void remove_holder(holder_t **handle, holder_t holder) {
-    holder_t *ptr = *handle, *temp;
+    holder_t *ptr = (*handle), *temp;
     if (ptr != NULL && ptr->thread == holder.thread) {
-        ptr = ptr->next;
+        (*handle) = ptr->next;
         free(ptr);
         return;
     }
