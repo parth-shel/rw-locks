@@ -34,10 +34,10 @@ bool lock(lock_t *lock, lstate_t type) {
     switch (type) {
         case READ:
             while (count_holders(lock->writers) > 0) {
-                tprio_t prio = get_prio(holder.thread);
-                if (prio > lock->lprio) {
-                    printf("inheriting prio - %d\n", prio);
-                    lock->lprio = prio;
+                holder.prio = get_prio(holder.thread);
+                if (holder.prio > lock->lprio) {
+                    printf("inheriting prio - %d\n", holder.prio);
+                    lock->lprio = holder.prio;
                     set_holders_prio(lock->readers, lock->lprio);
                     set_holders_prio(lock->writers, lock->lprio);
                 }
@@ -49,10 +49,10 @@ bool lock(lock_t *lock, lstate_t type) {
             break;
         case WRITE:
             while (count_holders(lock->writers) > 0 || count_holders(lock->readers) > 0) {
-                tprio_t prio = get_prio(holder.thread);
-                if (prio > lock->lprio) {
-                    printf("inheriting prio - %d\n", prio);
-                    lock->lprio = prio;
+                holder.prio = get_prio(holder.thread);
+                if (holder.prio > lock->lprio) {
+                    printf("inheriting prio - %d\n", holder.prio);
+                    lock->lprio = holder.prio;
                     set_holders_prio(lock->readers, lock->lprio);
                     set_holders_prio(lock->writers, lock->lprio);
                 }
