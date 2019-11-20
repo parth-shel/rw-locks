@@ -1,4 +1,5 @@
 FROM gcc:latest
-COPY . .
+COPY . /bin
+WORKDIR /bin
 RUN make
-CMD ["./target.exe"]
+CMD ["/bin/target.exe"]
