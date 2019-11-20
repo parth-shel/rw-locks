@@ -10,7 +10,7 @@
 lock_t rwlock;
 
 void *reader(void *prio) {
-    tprio_t thread_prio = *((tprio_t *)prio);
+    tprio_t thread_prio = (tprio_t *)prio;
     printf("setting reader priority - %d\n", thread_prio);
     if (set_prio(curr_thread(), thread_prio) != thread_prio) {
         printf("unable to set reader priority\n");
@@ -27,7 +27,7 @@ void *reader(void *prio) {
 }
 
 void *writer(void *prio) {
-    tprio_t thread_prio = *((tprio_t *)prio);
+    tprio_t thread_prio = (tprio_t *)prio;
     printf("setting writer priority - %d\n", thread_prio);
     if (set_prio(curr_thread(), thread_prio) != thread_prio) {
         printf("unable to set writer priority\n");
