@@ -53,8 +53,8 @@ tprio_t get_max_prio(holder_t *handle) {
     holder_t *ptr = handle;
     tprio_t max = -9999;
     while (ptr != NULL) {
-        if (ptr->prio > max) {
-            max = ptr->prio;
+        if (get_prio(ptr->thread) > max) {
+            max = get_prio(ptr->thread);
         }
         ptr = ptr->next;
     }
@@ -65,8 +65,8 @@ tprio_t get_min_prio(holder_t *handle) {
     holder_t *ptr = handle;
     tprio_t min = 9999;
     while (ptr != NULL) {
-        if (ptr->prio < min) {
-            min = ptr->prio;
+        if (get_prio(ptr->thread) < min) {
+            min = get_prio(ptr->thread);
         }
         ptr = ptr->next;
     }
